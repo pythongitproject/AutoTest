@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h5 id="test">fdsfdsffsdfsfds</h5>
+<script src="../static/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<script>
+{#$(function () {#}
+{#     alert(3);#}
+{#    Push();#}
+{#});#}
+
+{#    //ajax轮询#}
+{#setTimeout(function(){#}
+{#    alert(4);#}
+{#   Push();},#}
+{#   200);#}
+{##}
+{##}
+setInterval(function(){
+//alert("定时");
+    Push();},
+    3000);
+
+
+
+Push();
+
+
+function Push() {
+    alert(1);
+    $.ajax({
+        type: "GET",         //采用post方法传递参数
+        url: "/test1",    //服务器端接受请求参数的路径
+        success: function (data) {
+            alert(2);
+            $("#test").append(data);
+        }
+
+    });
+}
+</script>
+</body>
+</html>

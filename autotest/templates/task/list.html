@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}任务列表{% endblock %}
+{% block navbar %}
+    <section class="content-header">
+        <h1>任务列表</h1>
+        <ol class="breadcrumb">
+            <li><i class="fa fa-dashboard"></i> 当前位置</li>
+            <li class="active">任务管理</li>
+            <li class="active">任务列表</li>
+        </ol>
+    </section>
+{% endblock %}
+
+{% block content %}
+<div class="box box-primary">
+    <div class="box-header with-border">
+{#        {% include 'message.html' %}#}
+    </div>
+
+    <div class="box-body">
+       <div class="row" style="padding-bottom: 10px">
+           <div class="col-md-12">
+                  <form class="form-inline">
+                      <div class="form-group" style="padding-right: 20px">
+                        <label for="if_name">任务名称</label>
+                        <input type="text" class="form-control" id="if_name"
+                               {% if scan %}
+                                   value="{{ scan }}"
+                               {% endif %}
+                                placeholder="请输入任务名称">
+                      </div>
+{#                      <div class="form-group" style="padding-right: 20px">#}
+{#                        <label for="if_project">项目名称</label>#}
+{#                        <input type="text" class="form-control" id="if_project" placeholder="请输入项目名称">#}
+{#                      </div>#}
+                      <div class="form-group" style="padding-right: 20px">
+                        <button type="button" class="btn btn-primary" id="scan">模糊查询</button>
+                      </div>
+                      <button type="button" class="btn btn-success" id="if_add">添加任务</button>
+                  </form>
+           </div>
+       </div>
+
+        <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>任务名称</th>
+                <th>执行方式</th>
+                <th>执行时间</th>
+                <th>操作人</th>
+                <th>上次操作时间</th>
+                <th>执行状态</th>
+                <th colspan="3">操作</th>
+            </tr>
+            </thead>
+        <tbody>
+            {% if  task %}
+                {% for row in task %}
+                <tr>
+                    <td >{{ loop.index }}</td>
+                    <td >{{ row.task_name }}</td>
+                    <td >{{ row.task_type }}</td>
+                    <td style="text-overflow:ellipsis;overflow: hidden;white-space: nowrap;max-width: 10px">{{ row.task_time }}</td>
+                    <td style="text-overflow:ellipsis;overflow: hidden;white-space: nowrap;max-width: 150px">{{row.task_status}}</td>
+                    <td style="text-overflow:ellipsis;overflow: hidden;white-space: nowrap;max-width: 150px">{{row.user_id}}</td>
+                    <td>{{row.add_date}}</td>
+                    <td>
+                        <input type="button" class="btn btn-sm btn-success" value="运行">
+                    </td>
+                    <td style="text-align: center">
+                        <a class='fa fa-lg fa-edit text-light-blue'
+                           href='/interface/edit/{{row.id}}'></a>
+                    </td>
+                    <td style="text-align: center">
+                        <a class='fa fa-lg fa-ban text-red' href='/interface/del/{{row.id}}'></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr style="text-align: center;">
+                   <td colspan="12"> 暂无相关信息</td>
+                </tr>
+            {% endif %}
+        </tbody>
+        </table>
+    </div>
+
+    <div class="box-footer clearfix">
+        {% if interfaceifno %}
+            <ul class="pagination pagination-sm no-margin pull-right">
+                {% if pagination.page != 1 %}
+                    <li><a href="javascript:changePage(1);void(0);">首页</a></li>
+                {% endif %}
+                {% if pagination.total >= 1 %}
+                    <li><a href="javascript:void(0);">总记录条数：{{pagination.total}}</a></li>
+                {% endif %}
+                {% if pagination.has_prev %}
+                    <li><a href="javascript:changePage({{pagination.prev_num}});void(0);">上一页</a></li>
+                {% endif %}
+                {% for i in range(1, pagination.pages+ 1) %}
+                    {% if i == pagination.page %}
+                        <li><a href="javascript:changePage({{i}});void(0);"><b>{{i}}</b></a></li>
+                        {% else %}
+                        <li><a href="javascript:changePage({{i}});void(0);">{{i}}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if pagination.has_next %}
+                    <li><a href="javascript:changePage({{pagination.next_num}});void(0);">下一页</a></li>
+                {% endif %}
+                {% if pagination.page != pagination.pages %}
+                    <li><a href="javascript:changePage({{pagination.pages}});void(0);">尾页</a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    //模糊查询
+    $("#scan").click(function () {
+        var if_name = $("#if_name").val().trim();
+        {#var if_project = $("#if_project").val().trim();#}
+        if (if_name == '') {
+            window.location.reload();
+        } else {
+            window.location.href = '/interface/list?page=1&&if_name='+if_name;
+        }
+    });
+
+    $("#if_add").click(function () {
+        window.location.href = "/task/add";
+    });
+    //分页
+    function changePage(page) {
+        var if_name = $("#if_name").val().trim();
+        if(if_name == ''){
+            url = "/interface/list?page="+page;
+            window.location.href = url;
+        }else {
+            url = "/interface/list?page="+page + "&&if_name="+if_name;
+            window.location.href = url;
+        }
+    }
+    function initPage() {
+        slide_value = $(".slider").val() == "" ? 50 : parseInt($(".slider").val());
+        $(".slider").slider({
+            id: "blue",
+            max: 100,
+            value: slide_value
+        });
+
+        $('.status').bootstrapSwitch();
+        $(".status").on("switchChange.bootstrapSwitch", function (event, state) {
+            switchStatus($(this).data("id"), state, this);
+        });
+    }
+    function switchStatus(id, status, switchBox) {
+        restTemplate("PUT", "/notifies/" + id + "/status/" + status, null, function () {
+            $($(switchBox)).bootstrapSwitch("state", status);
+        });
+    }
+
+
+
+</script>
+{% endblock %}

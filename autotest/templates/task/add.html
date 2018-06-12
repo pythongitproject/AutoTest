@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}添加任务{% endblock %}
+
+
+{% block navbar %}
+    <section class="content-header">
+        <h1>添加任务</h1>
+        <ol class="breadcrumb">
+            <li><i class="fa fa-dashboard"></i> 当前位置</li>
+            <li class="active">任务管理</li>
+            <li class="active">添加任务</li>
+        </ol>
+    </section>
+{% endblock %}
+
+
+{% block content %}
+    <div class="box box-primary">
+        <div class="box-header with-border">
+{#            {% include 'message.html' %}#}
+        </div>
+
+        <div class="box-body">
+            <div class="row">
+              <div class="col-md-8">
+                  <form class="form-horizontal" >
+                  <div class="form-group">
+                    <label  class="col-sm-2 control-label">任务名称</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="if_name" placeholder="请输入任务名称">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label  class="col-sm-2 control-label">每</label>
+                    <div class="col-sm-2">
+                      <select class="form-control" id="execute_method">
+                          <option value="1">分钟</option>
+                          <option value="2">小时</option>
+                          <option value="3">天</option>
+                          <option value="4">周</option>
+                          <option value="5">月</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-2" id="cg">
+                        <select class="form-control">
+                          <option value="1">1分钟</option>
+                          <option value="2">2分钟</option>
+                          <option value="3">3分钟</option>
+                          <option value="4">4分钟</option>
+                        </select>
+                    </div>
+                        <label  class="control-label">执行一次</label>
+                  </div>
+
+                  <div class="form-group">
+                    <label  class="col-sm-2 control-label">固定</label>
+
+                        <label  class="control-label">执行一次</label>
+                  </div>
+
+                  <div class="form-group" style="padding-top: 50px">
+                    <div class="col-sm-offset-2 col-sm-8">
+                      <button type="button" class="btn btn-primary" id="if_sb">保存</button>
+                      <button type="reset" class="btn btn-warning">重置</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="col-md-4 res_text" style="display: none">
+                  <p style="text-align: center;font-size: large">响应信息</p>
+                  <code id="rs_status"></code><br>
+                  <code id="result" style="word-wrap: break-word;">
+
+                  </code>
+               </div>
+            </div>
+        </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/if.js') }}"></script>
+    <script>
+    
+    $("#execute_method").change(function () {
+        var change = $("#execute_method option:selected").val();
+
+        switch (change){
+            case "1" :
+                $("#cg").children().remove();
+                $("#cg").append("<select class=\"form-control\">\n" +
+                    "                          <option value=\"1\">1分钟</option>\n" +
+                    "                          <option value=\"2\">2分钟</option>\n" +
+                    "                          <option value=\"3\">3分钟</option>\n" +
+                    "                          <option value=\"4\">4分钟</option>\n" +
+                    "                        </select>");
+                break;
+            case "4" :
+                $("#cg").children().remove();
+                $("#cg").append("<select class=\"form-control\" >\n" +
+                    "                          <option value=\"1\">周一</option>\n" +
+                    "                          <option value=\"2\">周二</option>\n" +
+                    "                          <option value=\"3\">周三</option>\n" +
+                    "                          <option value=\"4\">周四</option>\n" +
+                    "                        </select>");
+                break;
+        }
+    });
+    function initPage() {
+        slide_value = $(".slider").val() == "" ? 50 : parseInt($(".slider").val());
+        $(".slider").slider({
+            id: "blue",
+            max: 100,
+            value: slide_value
+        });
+    }
+</script>
+{% endblock %}

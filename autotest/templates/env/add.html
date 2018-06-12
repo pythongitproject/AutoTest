@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}添加测试环境{% endblock %}
+
+
+{% block navbar %}
+    <section class="content-header">
+        <h1>添加环境</h1>
+        <ol class="breadcrumb">
+            <li><i class="fa fa-dashboard"></i> 当前位置</li>
+            <li class="active">执行环境</li>
+            <li class="active">添加环境</li>
+        </ol>
+    </section>
+{% endblock %}
+
+
+{% block content %}
+    <div class="box box-primary">
+        <div class="box-header with-border">
+{#            {% include 'message.html' %}#}
+        </div>
+
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-4">
+                   <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                主机列表
+                            </h3>
+                        </div>
+                       {% if master %}
+                            <div class="list-group info">
+                                {% for info in master %}
+                                  <a href="#" class="list-group-item">{{ info.ms_name }} || {{ info.ms }}
+                                      <button type="button" class="close rm" aria-label="Close" ms="{{ info.id }}" onclick='remover_list(this)'>
+                                          <span aria-hidden="true">&times;</span>
+                                      </button></a>
+                                {% endfor %}
+                            </div>
+                       {% else %}
+                            <div class="panel-body noneinfo">
+                                暂无相关信息
+                            </div>
+                       {% endif %}
+                   </div>
+
+               </div>
+              <div class="col-md-8">
+                  <form class="form-horizontal" >
+                      <div class="form-group">
+                        <label  class="col-sm-2 control-label">主机描述</label>
+                        <div class="col-sm-8">
+                          <input type="text" class="form-control" id="ms_name" placeholder="请输入主机描述">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label  class="col-sm-2 control-label">主机地址</label>
+                        <div class="col-sm-8">
+                          <input type="text" class="form-control" id="ms" placeholder="请输入http || https开头的主机地址">
+                        </div>
+                      </div>
+
+                      <div class="form-group" style="padding-top: 50px">
+                        <div class="col-sm-offset-2 col-sm-8">
+                          <button type="button" class="btn btn-primary" id="ms_sb">添加</button>
+                          <button type="reset" class="btn btn-warning">重置</button>
+                        </div>
+                      </div>
+                    </form>
+              </div>
+
+            </div>
+        </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='ms/ms.js') }}"></script>
+    <script>
+    function initPage() {
+        slide_value = $(".slider").val() == "" ? 50 : parseInt($(".slider").val());
+        $(".slider").slider({
+            id: "blue",
+            max: 100,
+            value: slide_value
+        });
+    }
+</script>
+{% endblock %}

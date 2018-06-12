@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}接口管理{% endblock %}
+
+{% block css %}
+<style>
+.table>tbody>tr>td,.table>thead>tr>td{
+    font-family: verdana,arial,sans-serif;
+    padding: 5px;
+    font-size:10px;
+    color:#333333;
+}
+</style>
+{% endblock %}
+
+{% block navbar %}
+    <section class="content-header">
+        <h1>编辑接口</h1>
+        <ol class="breadcrumb">
+            <li><i class="fa fa-dashboard"></i> 当前位置</li>
+            <li class="active">接口管理</li>
+            <li class="active">编辑接口</li>
+        </ol>
+    </section>
+{% endblock %}
+
+
+{% block content %}
+    <div class="box box-primary">
+        <div class="box-header with-border">
+{#            {% include 'message.html' %}#}
+        </div>
+        <div class="box-body">
+            <form class="form-horizontal" >
+                  <div class="form-group">
+                        <label class="col-sm-2 control-label">接口分组</label>
+                         <div class="col-sm-8">
+                            {% if group %}
+                                <select class="form-control" id="group_id">
+                                    <option  gid="">======请选择接口分组======</option>
+                                    {% for gp in group %}
+                                        <option gid="{{ gp.id }}"
+                                              {% if interfaceifno.group_id == gp.id   %}
+                                                    selected
+                                               {% endif %}>
+                                            {{ gp.group_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                             {% else %}
+                                <select class="form-control" id="group_id">
+                                  <option selected >======暂无接口分组信息======</option>
+                                </select>
+                             {% endif %}
+                         </div>
+                  </div>
+                  <input type="hidden" value="{{ interfaceifno.id }}" id="if_id">
+                  <div class="form-group">
+                    <label  class="col-sm-2 control-label">接口名称</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="if_name" value="{{ interfaceifno.if_name }}" placeholder="请输入接口名称">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label  class="col-sm-2 control-label">URL</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="if_url" value="{{ interfaceifno.if_url }}" placeholder="请输入URL地址">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label  class="col-sm-2 control-label">请求方式</label>
+                     <div class="col-sm-3">
+                        <select class="form-control" id="if_method">
+                          <option
+                                  {% if interfaceifno.if_method == 'GET'%}
+                                      selected
+                                  {% endif %}>GET
+                          </option>
+                          <option
+                                  {% if interfaceifno.if_method == 'POST'%}
+                                      selected
+                                  {% endif %}>POST
+                          </option>
+                          <option
+                                  {% if interfaceifno.if_method == 'DELETE'%}
+                                      selected
+                                  {% endif %}>DELETE
+                          </option>
+                        </select>
+                     </div>
+                  </div>
+                  <div class="form-group">
+                    <label  class="col-sm-2 control-label">数据传输方式</label>
+                     <div class="col-sm-3">
+                        <select class="form-control" id="if_type">
+                          <option
+                                    {% if interfaceifno.if_type == 'JSON'%}
+                                      selected
+                                     {% endif %}>JSON
+                          </option>
+                          <option
+                                    {% if interfaceifno.if_type == 'DATA'%}
+                                      selected
+                                    {% endif %}>DATA
+                          </option>
+                        </select>
+                     </div>
+                  </div>
+                  <div class="form-group">
+                    <label  class="col-sm-2 control-label">请求Header</label>
+                    <div class="col-sm-8">
+                        <table class="table table-hover table-condensed" id="request_header">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40%">Key</th>
+                                    <th style="width: 40%">Value</th>
+                                    <th style="width: 10%;text-align: right">
+                                        <button type="button" class="btn btn-primary add" id="hd_btn">添加</button>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% if header %}
+                                    {% for k,v in  header.items()%}
+                                        <tr>
+                                            <td name='var_key' contenteditable='true'>
+                                                {{ k }}
+                                            </td>
+                                            <td name='var_value' contenteditable='true'>
+                                                {{ v }}
+                                            </td>
+                                            <td>
+                                                <button type="button" class="close rm" aria-label="Close" onclick='del_step(this)'>
+                                                        <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endif %}
+                                </tbody>
+                        </table>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label  class="col-sm-2 control-label">请求body</label>
+                    <div class="col-sm-8">
+
+                    <ul class="nav nav-tabs bodyparam">
+                              <li role="presentation" class="bd_param"  onclick="changeBody(this)"><a href="#" >参数</a></li>
+                              <li role="presentation" class="active bd_text"  onclick="changeBody(this)"><a href="#">文本</a></li>
+                            </ul>
+                            <!--参数-->
+                            <table class="table request_param_body"  style="display: none">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40%">Key</th>
+                                        <th style="width: 40%">Value</th>
+                                        <th style="width: 10%">
+                                            <button type="button" class="btn btn-primary add" id="bd_btn">
+                                              添加
+                                            </button>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if body %}
+                                            {% for k,v in  body.items()%}
+                                                <tr>
+                                                    <td name='var_key' contenteditable='true' >
+                                                        {{ k }}
+                                                    </td>
+                                                    <td name='var_value' contenteditable='true' >
+                                                        {{ v }}
+                                                    </td>
+                                                    <td >
+                                                        <button type="button" class="close rm" aria-label="Close" onclick='del_step(this)'>
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </tbody>
+                            </table>
+                            <!--文本-->
+                            <div class="form-group request_text_body" style="padding-top: 5px">
+                                <div class="col-sm-12">
+                                  <textarea class="form-control text_body" rows="8" style="max-width:100%"
+                                            placeholder="请输入JSON格式文本参数..." >{% if body %}{{ body }}{% endif %}</textarea>
+                                </div>
+                            </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group" style="padding-top: 50px">
+                    <div class="col-sm-offset-2 col-sm-8">
+                      <button type="button" class="btn btn-primary" id="if_sb">保存</button>
+                      <button type="button" class="btn btn-success" id="ts_sb">测试</button>
+                    </div>
+                  </div>
+
+            </form>
+        </div>
+        <div class="col-md-4 res_text" style="display: none">
+                  <p style="text-align: center;font-size: large">响应信息</p>
+                  <code id="rs_status"></code><br>
+                  <code id="result" style="word-wrap: break-word;">
+
+                  </code>
+               </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/if_edit.js') }}"></script>
+    <script>
+    function initPage() {
+        slide_value = $(".slider").val() == "" ? 50 : parseInt($(".slider").val());
+        $(".slider").slider({
+            id: "blue",
+            max: 100,
+            value: slide_value
+        });
+    }
+</script>
+{% endblock %}
