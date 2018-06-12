@@ -1,6 +1,6 @@
 from celery import Celery
 import config
-#celery -A taskmanager.celery worker -l info -P eventlet win10
+#celery -A taskmanager.celery worker -l info -P eventlet window10
 # celery -A taskmanager.celery worker --loglevel=info
 
 # svn checkout 'https://svn.tuandai888.com:8443/svn/developers4/活动运营部发布文件/201805/31/单点登录-调整app里跳转授权登录逻辑/td-passport' --username linweili --password linweili
