@@ -36,44 +36,41 @@ class Execute():
                 break
         case_run["step_list"] = case_step_list
         return case_run
-    #
-    #
-    #
-    #
+
     def step(self, step_content):
         if_id = step_content["if_id"]
         interface = InterfaceInfo.objects.get(if_id=if_id)
-        var_list = self.extract_variables(step_content)
-        # 检查是否存在变量
-        if var_list:
-            for var_name in var_list:
-                var_value = self.get_param(var_name, step_content)
-                if var_value is None:
-                    var_value = self.get_param(var_name, self.step_json)
-                if var_value is None:
-                    var_value = self.extract_dict[var_name]
-                step_content = json.loads(self.replace_var(step_content, var_name, var_value))
+        # var_list = self.extract_variables(step_content)
+        # # 检查是否存在变量
+        # if var_list:
+        #     for var_name in var_list:
+        #         var_value = self.get_param(var_name, step_content)
+        #         if var_value is None:
+        #             var_value = self.get_param(var_name, self.step_json)
+        #         if var_value is None:
+        #             var_value = self.extract_dict[var_name]
+        #         step_content = json.loads(self.replace_var(step_content, var_name, var_value))
         if_dict = {"url": interface.url, "header": step_content["header"], "body": step_content["body"]}
 
 
     #     # 签名
     #     if interface.is_sign:
     #         if_dict["body"] = get_sign(self.sign_type, if_dict["body"], self.private_key)
-    #     if_dict["url"] = self.env_url + interface.url
-    #     if_dict["if_id"] = if_id
-    #     if_dict["if_name"] = step_content["if_name"]
-    #     if_dict["method"] = interface.method
-    #     if_dict["data_type"] = interface.data_type
-    #
-    #     try:
-    #         res = self.call_interface(if_dict["method"], if_dict["url"], if_dict["header"],
-    #                                              if_dict["body"], if_dict["data_type"])
-    #         if_dict["res_status_code"] = res.status_code
-    #         if_dict["res_content"] = res.text
-    #     except requests.RequestException as e:
-    #         if_dict["result"] = "Error"
-    #         if_dict["msg"] = str(e)
-    #         return if_dict
+        if_dict["url"] = self.env_url + interface.url
+        if_dict["if_id"] = if_id
+        if_dict["if_name"] = step_content["if_name"]
+        if_dict["method"] = interface.method
+        if_dict["data_type"] = interface.data_type
+
+        try:
+            res = self.call_interface(if_dict["method"], if_dict["url"], if_dict["header"],
+                                                 if_dict["body"], if_dict["data_type"])
+            if_dict["res_status_code"] = res.status_code
+            if_dict["res_content"] = res.text
+        except requests.RequestException as e:
+            if_dict["result"] = "Error"
+            if_dict["msg"] = str(e)
+            return if_dict
     #
     #     if step_content["extract"]:
     #         self.get_extract(step_content["extract"], if_dict["res_content"])
