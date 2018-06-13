@@ -4,7 +4,8 @@ import uuid
 
 from autotest import db
 from flask import render_template, request, jsonify
-from autotest.common import Execute,Methods
+from autotest.common import Methods
+from autotest.common.execute import Execute
 from autotest.interface import if_view
 from autotest.models import InterfaceInfo,Group
 
@@ -28,7 +29,8 @@ def add():
 
         try:
             if if_url and if_method:
-                status_code, result_text = Execute.call_interface( if_method, if_url, request_header_data,
+                execute = Execute('','')
+                status_code, result_text = execute.call_interface( if_method, if_url, request_header_data,
                                                                   request_body_data, if_type)
                 print(status_code,result_text)
                 if status_code == 200:

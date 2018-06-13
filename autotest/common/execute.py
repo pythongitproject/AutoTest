@@ -7,9 +7,9 @@ from autotest.common.signtype import get_sign
 from autotest.models import Master,TestCase,InterfaceInfo
 
 class Execute():
-    # def __init__(self, case_id, env_id):
-    #     self.case_id = case_id
-    #     self.env_id = env_id
+    def __init__(self, case_id, env_id):
+        self.case_id = case_id
+        self.env_id = env_id
         # self.prj_id, self.env_url, self.private_key = self.get_env(self.env_id)
         # self.sign_type = self.get_sign(self.prj_id)
     #
