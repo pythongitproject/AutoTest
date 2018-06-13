@@ -3,7 +3,8 @@
 import uuid, json
 from autotest import db
 from flask import render_template, request, jsonify, redirect
-from autotest.common import Execute,Methods
+from autotest.common.execute import Execute
+from autotest.common.utils import Methods
 from autotest.interface import if_view
 from autotest.models import InterfaceInfo,Group
 

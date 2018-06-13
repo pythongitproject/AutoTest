@@ -2,7 +2,8 @@
 #coding=utf-8
 from celery import Task
 from taskmanager import celery
-from autotest.common import Methods
+from autotest.common.execute import Execute
+from autotest.common.utils import Methods
 from autotest.models import InterfaceInfo
 
 

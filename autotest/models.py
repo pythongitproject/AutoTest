@@ -24,7 +24,6 @@ class InterfaceInfo(db.Model):
     if_type = db.Column(db.String(10), nullable=False)
     request_header_data = db.Column(db.Text,nullable=True)
     request_body_data = db.Column(db.Text, nullable=True)
-    # body_type = db.Column(db.String(10), nullable=True,default="")
     group_id = db.Column(db.String(100), nullable=True)
     user_id = db.Column(db.String(100), nullable=True)
     add_date = db.Column(db.DateTime,default=datetime.datetime.now(),nullable=True)
@@ -34,10 +33,10 @@ class TestCase(db.Model):
     __tablename__ = 'testcase'
     id = db.Column(db.String(100), primary_key=True)
     case_name = db.Column(db.String(100), nullable=True)
-    case_dec = db.Column(db.Text, nullable=True)
     case_content = db.Column(db.Text, nullable=False)
     case_status = db.Column(db.String(100), nullable=False)
-    user_id = db.Column(db.String(100), nullable=True)
+    case_result = db.Column(db.Text, nullable=False)
+    user_id = db.Column(db.String(100), nullable=False)
     add_date = db.Column(db.DateTime, nullable=False)
 
 class Task(db.Model):
@@ -84,9 +83,8 @@ class Environment(db.Model):
     __tablename__ = 'environment'
     id = db.Column(db.String(100), primary_key=True)
     env_name = db.Column(db.String(100), nullable=True)
-    env_dec = db.Column(db.Text, nullable=True)
     env_ip = db.Column(db.String(100), nullable=False)
     env_port = db.Column(db.String(10), nullable=False)
-    env_sec = db.Column(db.Text, nullable=True)
-    user_id = db.Column(db.String(100), nullable=True)
+    env_sec = db.Column(db.Text, nullable=False)
+    user_id = db.Column(db.String(100), nullable=False)
     add_date = db.Column(db.DateTime, default=datetime.datetime.now())
