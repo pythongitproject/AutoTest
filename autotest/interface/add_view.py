@@ -27,37 +27,34 @@ def add():
 
         print(if_name,group_id,if_url,if_method,if_type,request_header_data,request_body_data)
 
-        try:
-            if if_url and if_method:
-                execute = Execute('','')
-                status_code, result_text = execute.call_interface( if_method, if_url, request_header_data,
-                                                                  request_body_data, if_type)
-                print(status_code,result_text)
-                if status_code == 200:
-                    if sb_type == '0':
-                        try:
-                            if_info = InterfaceInfo(id=str(uuid.uuid1()),if_name=if_name,if_url=if_url,
-                                                    if_method=if_method,if_type=if_type,
-                                                    request_header_data=Methods.tostr(request_header_data),
-                                                    request_body_data=Methods.tostr(request_body_data),
-                                                    group_id=group_id,user_id='123')
-                            db.session.add(if_info)
-                            db.session.commit()
-                            print('接口请求成功,写入数据成功')
-                            return jsonify({'code': status_code, 'msg': '接口请求成功', 'data': result_text})
-                        except:
-                            print('接口请求成功,写入数据失败')
-                            return jsonify({'code': status_code, 'msg': '接口请求成功,写入数据失败', 'data': result_text})
-                    else:
-                        print('测试接口成功,不保存数据')
+        if if_url and if_method:
+            execute = Execute('','')
+            print('start')
+            status_code, result_text = execute.call_interface( if_method, if_url, request_header_data,
+                                                              request_body_data, if_type)
+            print(status_code,result_text)
+            if status_code == 200:
+                if sb_type == '0':
+                    try:
+                        if_info = InterfaceInfo(id=str(uuid.uuid1()),if_name=if_name,if_url=if_url,
+                                                if_method=if_method,if_type=if_type,
+                                                request_header_data=Methods.tostr(request_header_data),
+                                                request_body_data=Methods.tostr(request_body_data),
+                                                group_id=group_id,user_id='123')
+                        db.session.add(if_info)
+                        db.session.commit()
+                        print('接口请求成功,写入数据成功')
                         return jsonify({'code': status_code, 'msg': '接口请求成功', 'data': result_text})
+                    except:
+                        print('接口请求成功,写入数据失败')
+                        return jsonify({'code': status_code, 'msg': '接口请求成功,写入数据失败', 'data': result_text})
                 else:
-                    print('接口请求异常')
-                    return jsonify({'code': status_code, 'msg': '接口请求异常', 'data': result_text})
+                    print('测试接口成功,不保存数据')
+                    return jsonify({'code': status_code, 'msg': '接口请求成功', 'data': result_text})
             else:
-                print('请求url及请求方式不能为空')
-                return jsonify({'code': 201, 'msg': '接口请求失败', 'data': '请求url及请求方式不能为空'})
-        except:
-            print('接口请求失败')
-            return jsonify({'code': 201, 'msg': '接口请求失败','data':'接口请求失败'})
+                print('接口请求异常')
+                return jsonify({'code': status_code, 'msg': '接口请求异常', 'data': result_text})
+        else:
+            print('请求url及请求方式不能为空')
+            return jsonify({'code': 201, 'msg': '接口请求失败', 'data': '请求url及请求方式不能为空'})
 

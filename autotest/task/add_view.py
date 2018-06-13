@@ -14,6 +14,7 @@ def add():
 
     elif request.method == 'POST':
         return 'ok'
+
 @task_views.route('/status',methods = ['GET','POST'])
 def status():
     if request.method == 'GET':
@@ -21,5 +22,20 @@ def status():
         print(task_id)
         task_status = get_task_status(task_id)
         return task_status
+
+@task_views.route('/runcase',methods = ['GET','POST'])
+def runcese():
+    if request.method == 'GET':
+        from autotest.common.execute import Execute
+        # env_id = request.args.get('env_id')
+        # case_id = request.args.get('case_id')
+
+        case_id = '0208488e-6f17-11e8-9017-f215e9bc7bd8'
+        env_id = '1b88dbc6-6f17-11e8-bea3-42a5efd737f3'
+
+        execute = Execute(case_id, env_id)
+        case_result = execute.run_case()
+        print(case_result)
+        return str(case_result)
 
 

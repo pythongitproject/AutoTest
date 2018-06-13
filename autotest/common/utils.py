@@ -23,7 +23,7 @@ class Methods():
     def change(self,string):
         if string:
             string = re.sub('\'', '\"', string)
-            # string = json.loads(string)
+            string = json.loads(string)
             return string
         else:
             return None

@@ -4,7 +4,9 @@ import uuid, json
 from autotest import db
 from flask import render_template, request, jsonify, redirect
 from autotest.common.execute import Execute
+execute = Execute('','')
 from autotest.common.utils import Methods
+methods = Methods()
 from autotest.interface import if_view
 from autotest.models import InterfaceInfo,Group
 
@@ -20,8 +22,8 @@ def delete(if_id):
 def edit(if_id):
     if request.method == 'GET':
         object_list = InterfaceInfo.query.filter_by(id=if_id).first()
-        header = Methods.change(object_list.request_header_data)
-        body = Methods.change(object_list.request_body_data)
+        header = methods.change(object_list.request_header_data)
+        body = methods.change(object_list.request_body_data)
         group = Group.query.order_by(Group.add_date.desc()).all()
         return render_template('interface/edit.html',
                                interfaceifno=object_list,
@@ -35,8 +37,8 @@ def edit(if_id):
         if_method = request.form.get('if_method',type=str, default=None)
         if_type = request.form.get('if_type',type=str ,default=None)
         group_id = request.form.get('group_id', default=None)
-        request_header_data = Methods.tojson(request.form.get('request_header_data'))
-        request_body_data = Methods.tojson(request.form.get('request_body_data'))
+        request_header_data = methods.tojson(request.form.get('request_header_data'))
+        request_body_data = methods.tojson(request.form.get('request_body_data'))
 
         print(if_name,group_id,if_url,if_method,if_type,request_header_data,request_body_data)
 
@@ -50,8 +52,8 @@ def edit(if_id):
                         'if_url': if_url,
                         'if_method': if_method,
                         'if_type': if_type,
-                        'request_header_data': Methods.tostr(request_header_data),
-                        'request_body_data': Methods.tostr(request_body_data),
+                        'request_header_data': methods.tostr(request_header_data),
+                        'request_body_data': methods.tostr(request_body_data),
                         'group_id' :group_id,
                         'user_id': 'linweili',
                         'add_date': datetime.datetime.now()
@@ -65,7 +67,7 @@ def edit(if_id):
                     return jsonify({'code': '201', 'msg': '接口数据更新失败', 'data': '接口数据更新失败'})
             else:
                 try:
-                    status_code, result_text = Execute.call_interface(if_proxie, if_method, if_url, request_header_data,
+                    status_code, result_text = execute.call_interface(if_method, if_url, request_header_data,
                                                                       request_body_data, if_type)
                     print(status_code,result_text)
                     if status_code == 200:

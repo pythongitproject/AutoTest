@@ -21,7 +21,8 @@ class IFTask(Task):
 
 @celery.task(base = IFTask)
 def my_background_task():
-    from autotest.common import Execute
+    from autotest.common.execute import Execute
+    Execute = Execute('','')
     info = InterfaceInfo.query.order_by(InterfaceInfo.add_date.desc()).all()[0]
     method = info.if_method
     url = info.if_url

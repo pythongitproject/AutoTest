@@ -5,12 +5,14 @@ __author__ = 'wsy'
 import re, json, hashlib, requests
 from autotest.common.signtype import get_sign
 from autotest.models import Master,TestCase,InterfaceInfo
+from autotest.common import Methods
 
 class Execute():
     def __init__(self, case_id, env_id):
         self.case_id = case_id
         self.env_id = env_id
-        # self.prj_id, self.env_url, self.private_key = self.get_env(self.env_id)
+        if env_id:
+            self.env_name, self.env_url = self.get_env(self.env_id)
         # self.sign_type = self.get_sign(self.prj_id)
     #
     #
@@ -20,26 +22,28 @@ class Execute():
     #     self.step_json = []
     #
     def run_case(self):
-        case = TestCase.objects.get(case_id=self.case_id)
-        step_list = eval(case.content)
+        case = TestCase.query.filter_by(id=self.case_id).first()
+        step_list = eval(case.case_content)
         case_run = {"case_id": self.case_id, "case_name": case.case_name, "result": "pass"}
         case_step_list = []
 
         for step in step_list:
             step_info = self.step(step)
+            print('type:' + str(type(step_info)))
+            print('step_info"'+ str(step_info))
             case_step_list.append(step_info)
-            if step_info["result"] == "fail":
-                case_run["result"] = "fail"
-                break
-            if step_info["result"] == "error":
-                case_run["result"] = "error"
+            # if step_info["result"] == "fail":
+            #     case_run["result"] = "fail"
+            #     break
+            if step_info['result'] == "error":
+                case_run['result'] = "error"
                 break
         case_run["step_list"] = case_step_list
         return case_run
 
     def step(self, step_content):
-        if_id = step_content["if_id"]
-        interface = InterfaceInfo.objects.get(if_id=if_id)
+        if_id = step_content
+        interface = InterfaceInfo.query.filter_by(id=if_id).first()
         # var_list = self.extract_variables(step_content)
         # # 检查是否存在变量
         # if var_list:
@@ -50,27 +54,36 @@ class Execute():
         #         if var_value is None:
         #             var_value = self.extract_dict[var_name]
         #         step_content = json.loads(self.replace_var(step_content, var_name, var_value))
-        if_dict = {"url": interface.url, "header": step_content["header"], "body": step_content["body"]}
+
+        if_dict = {
+            "url": interface.if_url,
+            "header": interface.request_header_data,
+            "body": interface.request_body_data
+        }
 
 
     #     # 签名
     #     if interface.is_sign:
     #         if_dict["body"] = get_sign(self.sign_type, if_dict["body"], self.private_key)
 
-        if_dict["url"] = self.env_url + interface.url
+        if_dict["if_url"] = self.env_url + interface.if_url
         if_dict["if_id"] = if_id
-        if_dict["if_name"] = step_content["if_name"]
-        if_dict["method"] = interface.method
-        if_dict["data_type"] = interface.data_type
+        if_dict["if_name"] = interface.if_name
+        if_dict["if_method"] = interface.if_method
+        if_dict["if_type"] = interface.if_type
 
         try:
-            res = self.call_interface(if_dict["method"], if_dict["url"], if_dict["header"],
-                                                 if_dict["body"], if_dict["data_type"])
-            if_dict["res_status_code"] = res.status_code
-            if_dict["res_content"] = res.text
+            status_code, res_text = self.call_interface(if_dict["if_method"], if_dict["if_url"], if_dict["header"],
+                                                 if_dict["body"], if_dict["if_type"])
+            if_dict["res_status_code"] = status_code
+            if_dict["res_content"] = res_text
+            if_dict["result"] = "pass"
+            print('normal:' + str(if_dict))
+            return if_dict
         except requests.RequestException as e:
-            if_dict["result"] = "Error"
+            if_dict["result"] = "error"
             if_dict["msg"] = str(e)
+            print('error:' + str(if_dict))
             return if_dict
     #
     #     if step_content["extract"]:
@@ -80,7 +93,7 @@ class Execute():
     #     else:
     #         if_dict["result"] = "pass"
     #         if_dict["msg"] = {}
-    #     return if_dict
+
 
     # 验证结果
     # def validators_result(self, validators_list, res):
@@ -174,8 +187,8 @@ class Execute():
 
     # 获取测试环境
     def get_env(self, env_id):
-        master = Master.objects.get(id=env_id)
-        return master.name, master.url
+        master = Master.query.filter_by(id=env_id).first()
+        return master.ms_name, master.ms
 
     # # 获取签名方式
     # def get_sign(self, prj_id):
@@ -191,25 +204,29 @@ class Execute():
 
     # 发送请求
     def call_interface(self, method, url, header, data, content_type='json'):
-        # print(1)
-        # print(method, url, header, data, content_type)
-        if method.upper() == "POST":
-            # print(4)
-            if content_type == "json":
-                # print(5)
-                result = requests.post(url=url, json=data, headers=header, verify=False)
-                # print(6)
+        try:
+            print(1)
+            print(method, url, header, data, content_type)
+            if method.upper() == "POST":
+                print(4)
+                if content_type == "json":
+                    print(5)
+                    result = requests.post(url=url, json=data, headers=header, verify=False)
+                    print(6)
+                    return result.status_code, result.text
+                if content_type == "data":
+                    print(7)
+                    result = requests.post(url=url, data=data, headers=header, verify=False)
+                    print(8)
+                    return result.status_code, result.text
+            if method.upper() == "GET":
+                print(9)
+                result = requests.get(url=url, params=data, headers=header, verify=False)
+                print(10)
                 return result.status_code, result.text
-            if content_type == "data":
-                # print(7)
-                result = requests.post(url=url, data=data, headers=header, verify=False)
-                # print(8)
-                return result.status_code, result.text
-        if method.upper() == "GET":
-            # print(9)
-            result = requests.get(url=url, params=data, headers=header, verify=False)
-            # print(10)
-            return result.status_code, result.text
+        except:
+            print('请求异常')
+            return '201', '请求异常'
 
 
 
